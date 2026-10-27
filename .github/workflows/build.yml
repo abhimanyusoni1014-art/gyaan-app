@@ -22,18 +22,24 @@ jobs:
 
       - name: Flutter project banao
         run: |
-          flutter create --org com.gyaansaathi --project-name gyaan_saathi --platforms android .
+          flutter create --org com.simune --project-name simune --platforms android .
           flutter pub add http shared_preferences
+          flutter pub add --dev flutter_launcher_icons
+
+      - name: App icon lagao
+        run: |
+          printf 'flutter_launcher_icons:\n  android: true\n  ios: false\n  image_path: "icon.png"\n  adaptive_icon_background: "#08080C"\n  adaptive_icon_foreground: "icon_fg.png"\n' > flutter_launcher_icons.yaml
+          dart run flutter_launcher_icons
 
       - name: Internet permission aur app ka naam
         run: |
           sed -i 's#<application#<uses-permission android:name="android.permission.INTERNET"/>\n    <application#' android/app/src/main/AndroidManifest.xml
-          sed -i 's#android:label="[^"]*"#android:label="Gyaan Saathi"#' android/app/src/main/AndroidManifest.xml
+          sed -i 's#android:label="[^"]*"#android:label="Simune"#' android/app/src/main/AndroidManifest.xml
 
       - name: APK banao
-        run: flutter build apk --release --dart-define=APP_SECRET=${{ secrets.APP_SECRET }}
+        run: flutter build apk --release --dart-define=SUPABASE_URL="${{ secrets.SUPABASE_URL }}" --dart-define=SUPABASE_ANON_KEY="${{ secrets.SUPABASE_ANON_KEY }}"
 
       - uses: actions/upload-artifact@v4
         with:
-          name: gyaan-saathi-apk
+          name: simune-apk
           path: build/app/outputs/flutter-apk/app-release.apk
