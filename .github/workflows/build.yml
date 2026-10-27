@@ -37,7 +37,13 @@ jobs:
           sed -i 's#android:label="[^"]*"#android:label="Simune"#' android/app/src/main/AndroidManifest.xml
 
       - name: APK banao
-        run: flutter build apk --release --dart-define=SUPABASE_URL="${{ secrets.SUPABASE_URL }}" --dart-define=SUPABASE_ANON_KEY="${{ secrets.SUPABASE_ANON_KEY }}"
+        env:
+          SB_URL: ${{ secrets.SUPABASE_URL }}
+          SB_KEY: ${{ secrets.SUPABASE_ANON_KEY }}
+        run: |
+          SB_URL=$(printf '%s' "$SB_URL" | tr -d '[:space:]')
+          SB_KEY=$(printf '%s' "$SB_KEY" | tr -d '[:space:]')
+          flutter build apk --release --dart-define=SUPABASE_URL="$SB_URL" --dart-define=SUPABASE_ANON_KEY="$SB_KEY"
 
       - uses: actions/upload-artifact@v4
         with:
